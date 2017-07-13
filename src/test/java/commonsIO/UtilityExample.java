@@ -149,6 +149,7 @@ public class UtilityExample {
         FileUtils.copyFileToDirectory(new File("d:/cxyapi.xml"), new File("d:/cxyapi"));
         //拷贝url到文件
         FileUtils.copyURLToFile(new URL("http://www.cxyapi.com/rss/cxyapi.xml"), new File("d:/cxyapi.xml"));
+
     }
 
 }
