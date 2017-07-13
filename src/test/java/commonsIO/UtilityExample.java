@@ -2,18 +2,14 @@ package commonsIO; /**
  * Created by liush on 17-7-13.
  */
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.io.FileSystemUtils;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.LineIterator;
-import org.apache.commons.io.IOCase;
+import org.apache.commons.io.*;
+import org.apache.commons.io.output.CountingOutputStream;
+import org.apache.commons.io.output.TeeOutputStream;
 
 /**
  * FileUtils：提供文件操作（移动文件，读取文件，检查文件是否存在等等）的方法。  IOCase：提供字符串操作以及比较的方法。
@@ -99,6 +95,11 @@ public class UtilityExample {
         lines.add("欢迎访问:");
         lines.add("www.cxyapi.com");
         FileUtils.writeLines(new File("/home/liush/s3/error/cxyapi.txt"), lines, true);
+        //文本写入指定文件
+        String name = "my name is panxiuyan";
+        File file =  new File("c:\\name.txt");
+        FileUtils.writeStringToFile(file, name);
+
 
         //static void:writeStringToFile(File file, String data, String encoding, boolean append)
         //boolean追加模式
@@ -167,6 +168,70 @@ public class UtilityExample {
         //文件 或 文件夹大小
         System.out.println(FileUtils.sizeOf(new File("D:/cxyapi")));
         System.out.println(FileUtils.sizeOfDirectory(new File("D:/cxyapi")));
+
+        //文件目录操作
+        File dir = new File("c:\\test");
+        FileUtils.cleanDirectory(dir);//清空目录下的文件
+        FileUtils.deleteDirectory(dir);//删除目录和目录下的文件
+        //网络流保存为文件
+        URL url = new URL("http://www.163.com");
+        File file1 = new File("c:\\163.html");
+        FileUtils.copyURLToFile(url, file1);
+        //目录大小
+        long size = FileUtils.sizeOfDirectory(dir);
+        // 输入流复制到 输出流
+        Writer write = new FileWriter("c:\\kk.dat");
+        InputStream ins = new FileInputStream(new File("c:\\text.txt"));
+        IOUtils.copy(ins, write);
+        write.close();
+        ins.close();
+
+        //目录操作
+        File testFile = new File( "testFile.txt" );
+        //如果不存在,新建
+        // 如果存在,修改文件修改时间
+        FileUtils.touch( testFile );
+        //记录流的读取写入字节数
+        File test = new File( "test.dat" );
+        //输出流的统计
+        CountingOutputStream countStream = null;
+        //输入流的统计
+        //CountingInputStream countStream = null;
+        try {
+            FileOutputStream foss = new FileOutputStream( test );
+            countStream = new CountingOutputStream( foss );
+            countStream.write( "Hello".getBytes( ) );
+        } catch( IOException ioe ) {
+            System.out.println( "Error writing bytes to file." );
+        } finally {
+            IOUtils.closeQuietly( countStream );
+        }
+
+        if( countStream != null ) {
+            int bytesWritten = countStream.getCount( );
+            System.out.println( "Wrote " + bytesWritten + " bytes to test.dat" );
+        }
+
+
+        //相同的内容写入不同的文本
+        File test1 = new File("split1.txt");
+        File test2 = new File("split2.txt");
+        OutputStream outStream = null;
+        try {
+            FileOutputStream fos1 = new FileOutputStream( test1 );
+            FileOutputStream fos2 = new FileOutputStream( test2 );
+            //包含不同的文本
+            outStream = new TeeOutputStream( fos1, fos2 );
+            outStream.write( "One Two Three, Test".getBytes( ) );
+            outStream.flush( );
+        } catch( IOException ioe ) {
+            System.out.println( "Error writing to split output stream" );
+        } finally {
+            IOUtils.closeQuietly( outStream );
+        }
+
+
     }
+
 
 }
