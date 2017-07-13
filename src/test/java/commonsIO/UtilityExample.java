@@ -3,6 +3,7 @@ package commonsIO; /**
  */
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -149,7 +150,23 @@ public class UtilityExample {
         FileUtils.copyFileToDirectory(new File("d:/cxyapi.xml"), new File("d:/cxyapi"));
         //拷贝url到文件
         FileUtils.copyURLToFile(new URL("http://www.cxyapi.com/rss/cxyapi.xml"), new File("d:/cxyapi.xml"));
+        //判断是否包含文件或者文件夹
+        boolean b=FileUtils.directoryContains(new File("D:/cxyapi"), new File("D:/cxyapi/cxyapi.txt"));
+        System.out.println(b);
 
+        //获得临时目录 和 用户目录
+        System.out.println(FileUtils.getTempDirectoryPath());
+        System.out.println(FileUtils.getUserDirectoryPath());
+
+        //打开流，如果不存在创建文件及其目录结构
+        //第二个参数表示 文件流是否是追加方式
+        FileOutputStream fos=FileUtils.openOutputStream(new File("D:/cxyapi/cxyapi.txt"),true);
+        fos.write(new String("欢迎访问：www.cxyapi.com\r\n").getBytes());
+        fos.close();
+
+        //文件 或 文件夹大小
+        System.out.println(FileUtils.sizeOf(new File("D:/cxyapi")));
+        System.out.println(FileUtils.sizeOfDirectory(new File("D:/cxyapi")));
     }
 
 }
