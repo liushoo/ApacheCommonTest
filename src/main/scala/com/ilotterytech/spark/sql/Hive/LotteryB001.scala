@@ -7,7 +7,7 @@ import java.sql.Date
 import org.apache.spark.sql.{Row, SQLContext, SaveMode}
 import org.apache.spark.sql.hive.HiveContext
 import org.apache.spark.{SparkConf, SparkContext}
-import util.CombineAlgorithm
+
 import scala.collection.mutable.ArrayBuffer
 object LotteryB001 {
   //基本票
@@ -163,8 +163,8 @@ object LotteryB001 {
         val zs = x.group(3)
         val hq = x.group(5)
         val lq = x.group(7)
-        val zhongzhusum = CombineAlgorithm.C(7, 6).intValue() * zs.toInt
-        val total_cost = zhongzhusum * 2
+      //  val zhongzhusum = CombineAlgorithm.C(7, 6).intValue() * zs.toInt
+      //  val total_cost = zhongzhusum * 2
         val select_mode = 2
         //玩法 play_mode
         /**
@@ -175,10 +175,10 @@ object LotteryB001 {
           * 5：胆拖
           */
         val play_mode = 2
-        val consume = Consume(consumeId, rec.id, select_mode, play_mode, hq, lq, zs.toInt, total_cost)
+     //   val consume = Consume(consumeId, rec.id, select_mode, play_mode, hq, lq, zs.toInt, total_cost)
         println("红色复式==取^=1==" + x.group(1) + "==玩法2==" + x.group(2) + "==注数3==" + x.group(3) + "==取*4==" + x.group(4) + "==红球5==" + x.group(5) + "==取~6==" + x.group(6) + "==蓝球7==" + x.group(7))
-        rec.cons += consume
-        rec.total_cost=total_cost.toFloat
+       // rec.cons += consume
+       // rec.total_cost=total_cost.toFloat
       })
       td.findAllMatchIn(content).foreach(x => {
         val consumeId = System.currentTimeMillis()
@@ -194,8 +194,8 @@ object LotteryB001 {
         val lq = x.group(8)
         val d = (6 - dq.length / 2)
         val e = hq.length / 2
-        val zhongzhusum = td.toInt * CombineAlgorithm.C(e, d).intValue() * 1
-        val total_cost = zhongzhusum * 2
+      //  val zhongzhusum = td.toInt * CombineAlgorithm.C(e, d).intValue() * 1
+     //   val total_cost = zhongzhusum * 2
         val select_mode = 5
         //玩法标志位50（多蓝球胆拖)
         //玩法标志位40
@@ -208,10 +208,10 @@ object LotteryB001 {
           * 5：胆拖
           */
         val play_mode = 5
-        val consume = Consume(consumeId, rec.id, select_mode, play_mode, hq, lq, zhongzhusum.toInt, total_cost.toFloat)
+        //val consume = Consume(consumeId, rec.id, select_mode, play_mode, hq, lq, zhongzhusum.toInt, total_cost.toFloat)
         println("胆拖==取^=1==" + x.group(1) + "==玩法2==" + x.group(2) + "==胆拖3==" + x.group(3) + "==红球胆4==" + x.group(4) + "==取*5==" + x.group(5) + "==红球拖6==" + x.group(6) + "==取~7==" + x.group(7) + "==蓝球8==" + x.group(8))
-        rec.cons += consume
-        rec.total_cost=total_cost.toFloat
+       // rec.cons += consume
+       // rec.total_cost=total_cost.toFloat
       })
       f4ls.findAllMatchIn(content).foreach(x => {
         val consumeId = System.currentTimeMillis()
@@ -244,8 +244,8 @@ object LotteryB001 {
         val hq = x.group(5)
         val lq = x.group(7)
         //3个蓝球
-        val zhongzhusum = CombineAlgorithm.C(7, 6).intValue() * 3 * zs.toInt
-        val total_cost = zhongzhusum * 2
+      //  val zhongzhusum = CombineAlgorithm.C(7, 6).intValue() * 3 * zs.toInt
+    //    val total_cost = zhongzhusum * 2
         val select_mode = 1
         //玩法标志位50（多蓝球胆拖)
         //玩法标志位40
@@ -258,10 +258,10 @@ object LotteryB001 {
           * 5：胆拖
           */
         val play_mode = 4
-        val consume = Consume(consumeId, rec.id, select_mode, play_mode, hq, lq, zs.toInt, total_cost.toFloat)
-        rec.total_cost=total_cost
+      //  val consume = Consume(consumeId, rec.id, select_mode, play_mode, hq, lq, zs.toInt, total_cost.toFloat)
+       // rec.total_cost=total_cost
         println("全复式==取^=1==" + x.group(1) + "==玩法2==" + x.group(2) + "==注数3==" + x.group(3) + "==取*4==" + x.group(4) + "==红球5==" + x.group(5) + "==取~6==" + x.group(6) + "==蓝球7==" + x.group(7))
-        rec.cons += consume
+       // rec.cons += consume
       })
       rec
     }

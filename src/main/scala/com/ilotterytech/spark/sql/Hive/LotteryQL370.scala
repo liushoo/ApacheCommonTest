@@ -5,7 +5,7 @@ import java.sql.Timestamp
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.hive.HiveContext
-import util.CombineAlgorithm
+
 
 import scala.collection.mutable.ArrayBuffer
 

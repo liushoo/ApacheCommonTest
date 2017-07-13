@@ -3,10 +3,7 @@ package com.ilotterytech.spark.D1D2
 /**
   * Created by ZhangXuan on 17-7-7
   */
-import com.ilotterytech.spark.D1D2.sile.SiLeGameFactoryFactory
-import com.ilotterytech.spark.D1D2.sile.utils.TicketUtils
-import com.ilotterytech.spark.D1D2.{GameCategoryDecoder, GameCategoryFactory, GameFactory, LotteryConsume}
-import com.ilotterytech.spark.D1D2.utils.IdGeneratorUtils
+
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.hive.HiveContext
 import org.apache.spark.{SparkConf, SparkContext}
@@ -28,9 +25,9 @@ object Main {
 
         println("Spark will load " + region + "'s" + gameId + " game data into D1 in " + partNum + " number files")
 
-        val factory: GameFactory = SiLeGameFactoryFactory.getInstance.getFactory(gameId)
+   /*     val factory: GameFactory = SiLeGameFactoryFactory.getInstance.getFactory(gameId)
         val cateFactory: GameCategoryFactory = factory.getCategoryFactory
-        val consume : LotteryConsume = new LotteryConsume
+        val consume : LotteryConsume = new LotteryConsume*/
 
         //val fetchSql = "SELECT a.serial,a.station,a.issue1,a.issue2,a.st_order,a.ordertime,a.content,a.order_num FROM shanxi.b001_selldata a where a.ordertime>='2016-01-01' and a.ordertime<='2016-01-10'"
         val fetchSql = "SELECT a.serial,a.station,a.issue1,a.issue2,a.st_order,a.ordertime,a.flag5,a.content,a.order_num FROM " + region + "." + gameId.toLowerCase + "_selldata a"
@@ -38,23 +35,23 @@ object Main {
             //case (Row(serial: String, station: String, issue1: String, issue2: String, st_order: Int, ordertime: String, flag5: Int, content: String, order_num: Int), uid : Long) => {
             case (row : Row, uid : Long) => {
                 //生成票数据
-                val id : Long = IdGeneratorUtils.genTimestampBasedId(uid)
-                val ticket : String = generateTicketString(row, id, factory.getGameId)
+            //    val id : Long = IdGeneratorUtils.genTimestampBasedId(uid)
+             //   val ticket : String = generateTicketString(row, id, factory.getGameId)
 
                 //生成消费注数据
                 val content : String = row.getAs[String]("content")
                 val flag5 : Int = row.getAs[Int]("flag5")
-                val me : String = generateConsumeString(content, id, flag5, consume, cateFactory)
+           //     val me : String = generateConsumeString(content, id, flag5, consume, cateFactory)
 
                 //返回元组数据
-                (ticket, me)
+            //    (ticket, me)
             }
         }
 
         rdd.cache()
 
-        rdd.map(p => p._1).coalesce(partNum).saveAsTextFile("/user/hdfs/temp/d1/" + gameId + "/ticket")
-        rdd.map(p => p._2).coalesce(partNum).saveAsTextFile("/user/hdfs/temp/d1/" + gameId + "/consume")
+        //rdd.map(p => p._1).coalesce(partNum).saveAsTextFile("/user/hdfs/temp/d1/" + gameId + "/ticket")
+        //rdd.map(p => p._2).coalesce(partNum).saveAsTextFile("/user/hdfs/temp/d1/" + gameId + "/consume")
 
         sc.stop()
     }
@@ -93,56 +90,55 @@ object Main {
         buf.toString
     }
 
-    def generateConsumeString(content : String, id : Long, flag5 : Int, consume : LotteryConsume, factory : GameCategoryFactory): String = {
-        val cont : Array[String] = factory.decodeContent(content)
-        var sum: Int = 0
-        var s : String = null
-        val buf : StringBuffer = new StringBuffer()
-        for (i <- 0 until cont.length) {
-            //循环处理每一个消费注
-            s = cont(i)
-            val prefix : String = factory.decodeCategoryPrefix(s)
-            val decoder : GameCategoryDecoder = factory.getCategoryDecoder(prefix)
-            if (decoder == null){
-                println("can not found " + prefix + " decoder")
-            }
-            else {
-                try {
-                    decoder.decode(s, consume)
-                }
-                catch {
-                    case e : Exception => println("decode error : " + e.getMessage)
-                }
+    def generateConsumeString(content : String, id : Long, flag5 : Int) = {
+       // val cont : Array[String] = factory.decodeContent(content)
+      /* var sum: Int = 0
+     var s : String = null
+     val buf : StringBuffer = new StringBuffer()
+     for (i <- 0 until cont.length) {
+         //循环处理每一个消费注
+     val prefix : String = factory.decodeCategoryPrefix(s)
+         val decoder : GameCategoryDecoder = factory.getCategoryDecoder(prefix)
+         if (decoder == null){
+             println("can not found " + prefix + " decoder")
+         }
+         else {
+             try {
+                // decoder.decode(s, consume)
+             }
+             catch {
+                 case e : Exception => println("decode error : " + e.getMessage)
+             }
 
-                if (consume == null || consume.getTotalNum == null){
-                    println("decode [" + prefix + "] error and ora content is " + content)
-                }
-                sum += consume.getTotalNum
-                val cid: Long = IdGeneratorUtils.genUniqueBasedId(id, i)
-                buf.append(cid)                                 //消费注ID
-                    .append(DELIMITER)
-                    .append(id)                                 //基本票表ID
-                    .append(DELIMITER)
-                    .append(TicketUtils.getSelectMode(flag5))   //选择方式
-                    .append(DELIMITER)
-                    .append(decoder.getCategoryId)              //玩法
-                    .append(DELIMITER)
-                    .append(consume.getPrefixNumber)            //红球或胆拖码（投注信息）
-                    .append(DELIMITER)
-                    .append(consume.getSuffixNumber)            //蓝球
-                    .append(DELIMITER)
-                    .append(consume.getTimes)                   //倍数
-                    .append(DELIMITER)
-                    .append(consume.getTotalNum)                //注数
-                    .append(DELIMITER)
-                    .append(consume.getTotalPrice)              //金额
-                if (i < cont.length - 1) {
-                    buf.append("\n")
-                }
-                //println("deocde for [" + s + "]")
-            }
-        }
+           if (consume == null || consume.getTotalNum == null){
+                 println("decode [" + prefix + "] error and ora content is " + content)
+             }
+             sum += consume.getTotalNum
+             val cid: Long = IdGeneratorUtils.genUniqueBasedId(id, i)
+             buf.append(cid)                                 //消费注ID
+                 .append(DELIMITER)
+                 .append(id)                                 //基本票表ID
+                 .append(DELIMITER)
+                 .append(TicketUtils.getSelectMode(flag5))   //选择方式
+                 .append(DELIMITER)
+                 .append(decoder.getCategoryId)              //玩法
+                 .append(DELIMITER)
+                 .append(consume.getPrefixNumber)            //红球或胆拖码（投注信息）
+                 .append(DELIMITER)
+                 .append(consume.getSuffixNumber)            //蓝球
+                 .append(DELIMITER)
+                 .append(consume.getTimes)                   //倍数
+                 .append(DELIMITER)
+                 .append(consume.getTotalNum)                //注数
+                 .append(DELIMITER)
+                 .append(consume.getTotalPrice)              //金额
+             if (i < cont.length - 1) {
+                 buf.append("\n")
+             }
+             //println("deocde for [" + s + "]")
+         }
+        }**/
 
-        buf.toString
+
     }
 }
