@@ -1,6 +1,6 @@
 import org.apache.commons.lang.StringUtils;
 
-import java.util.Arrays;
+import java.util.*;
 
 /**
  * Created by liush on 17-7-9.
@@ -213,6 +213,45 @@ public class StringUtilsTest {
         System.out.println(StringUtils.reverse("中国人民"));
         //根据特定字符(二参数)分隔进行反转
         System.out.println(StringUtils.reverseDelimited("中:国:人民", ':'));
+
+
+
+        // list转字符串
+        String str="";
+        List<String> list = new ArrayList<String>();
+        list.add("A");
+        list.add("B");
+        list.add("C");
+        str = StringUtils.join(list.toArray(), ","); // 根据不同切割符返回字符串
+        System.out.println("正常List转换："+ str);
+        list.clear();
+        str = StringUtils.join(list.toArray(), ",");
+        System.out.println("size为0转换："+ str);
+
+        // 字符串数组转为字符串
+        String[] strArray = {"AA", "BB", "CC", "DD"};
+        str = StringUtils.join(strArray, "-");
+        System.out.println("正常数组转换："+ str);
+
+        strArray = new String[3];
+        str = StringUtils.join(strArray, "-");
+        System.out.println("特殊数组转换："+str);
+
+        // Integer引用类型转字符串
+
+        Integer[] array = new Integer[3];
+        array[0] = 1;
+        array[2] = 2;
+        str = StringUtils.join(array, "-");
+        System.out.println("Integer转换："+str);
+
+        // set转换为字符串
+        Set<String> set = new HashSet<String>();
+        set.add("AA");
+        set.add("BB");
+        set.add("CC");
+        str = StringUtils.join(set.toArray(), ";");
+        System.out.println("特殊数组转换："+str);
     }
 
     //将数组转换为List
