@@ -60,5 +60,16 @@ public class SystemProperty {
         //行分隔符
         System.out.println("line_separator:"
                 + System.getProperty("line.separator"));
+        //java.class.path  Java 类路径
+        System.out.println("java.class.path:"
+                + System.getProperty("java.class.path"));
+        //加载库时搜索的路径列表
+        System.out.println("java.library.path:"
+                + System.getProperty("java.library.path"));
+        //默认的临时文件路径
+        System.out.println("java.io.tmpdir:"
+                + System.getProperty("java.io.tmpdir"));
+
+
     }
 }

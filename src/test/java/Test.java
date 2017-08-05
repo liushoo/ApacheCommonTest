@@ -9,9 +9,7 @@ public class Test {
     private static int m = 6;
 
     public static void main(String[] args) {
-        List<Integer> iL = new ArrayList<Integer>();
-        new Test().plzh("7", iL,  m);
-        System.out.println("total : " + total);
+        System.out.println(String.format("%s=-Dfoo=ShouldBeOverriddenBelow", "spark.driver.extraJavaOptions"));
     }
 
     private void plzh(String s, List<Integer> iL, int m) {
